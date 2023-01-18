@@ -32,10 +32,15 @@ let score = 0;
 
 
 let levels = [];
-let levelNum = 0
+let levelNum = 0;
+let mousex = 0;
+let mousey = 0;
+let isMobile = false;
 function init() {
 
   $("#demo-canvas").mousedown(handleCanvasClick);
+  //$("#demo-canvas").mousemove(handleMouseMove);
+  $("#demo-canvas").on("touchmove", handleTouchMove);
 
   // TODO figure out if I can use touch events
   //document.getElementById("demo-canvas").addEventListener('touchstart', handleCanvasTouch);
@@ -46,32 +51,72 @@ function init() {
 
   //window.setInterval(drawCanvas, 15);
   window.requestAnimationFrame(drawCanvas);
-  
+
   window.setInterval(cleanData, 100);
   window.setInterval(recalculateData, 15);
 
   window.addEventListener('resize', setWindowSize, true);
   window.addEventListener('resize', setPlanetLocations, true);
-  
-  $(document).on("keydown", move);
-  $(document).on("keyup", stop);
-  
-  
-  
-  // TODO create enemy timeline  
+
+  // if mobile
+  if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    isMobile = true;
+    $("#demo-canvas").mousemove(handleMouseMove);
+    //$("#demo-canvas").on("touchmove", handleMouseMove);
+  }
+  // else desktop
+  else {
+    $("#demo-canvas").mousemove(handleMouseMove);
+    $(document).on("keydown", move);
+    $(document).on("keyup", stop);
+  }
+
+
+  // TODO create enemy timeline
   //window.setInterval(addEnemy, 2000);
   //enemies = level1;
-  
-  levels[0] = [
+
+  // Level 1
+  levels.push([
 	  getEnemy(0,50,160,8,1,50),
-	  getEnemy(1,50*4,80,8,1,50),
+	  getEnemy(0,50*24,160,8,1,50),
+  ]);
+
+  // Level 2
+  levels.push([
+    getEnemy(0,50,160,8,1,50),
+    getEnemy(0,50*8,160,8,1,50),
+    getEnemy(0,50*16,160,8,1,50),
+    getEnemy(0,50*24,160,8,1,50),
+  ]);
+
+  // Level 3
+  levels.push([
+	  getEnemy(1,50,160,8,1,50),
+	  getEnemy(1,50*20,80,8,1,50),
+    ]);
+
+  // Level 4
+  levels.push([
+	  getEnemy(0,50,160,8,1,50),
 	  getEnemy(0,50*8,160,8,1,50),
-	  getEnemy(1,50*12,80,8,1,50),
 	  getEnemy(0,50*16,160,8,1,50),
 	  getEnemy(1,50*20,80,8,1,50),
 	  getEnemy(0,50*24,160,8,1,50),
-    ];
-  levels[1] = [
+    ]);
+
+  // Level 5
+  levels.push([
+	  getEnemy(0,50,160,8,1,50),
+	  getEnemy(1,50*4,80,8,1,50),
+	  getEnemy(0,50*8,160,8,1,50),
+	  getEnemy(0,50*16,160,8,1,50),
+	  getEnemy(1,50*20,80,8,1,50),
+	  getEnemy(0,50*24,160,8,1,50),
+    ]);
+
+  // Level 6
+  levels.push([
 	getEnemy(0,50,160,8,1,50),
 	getEnemy(1,50*4,80,8,1,50),
 	getEnemy(0,50*8,160,8,1,50),
@@ -79,7 +124,7 @@ function init() {
 	getEnemy(0,50*16,160,8,1,50),
 	getEnemy(1,50*20,80,8,1,50),
 	getEnemy(0,50*24,160,8,1,50),
-	
+
 	getEnemy(0,50,240,8,1,50),
 	getEnemy(1,50*4,320,8,1,50),
 	getEnemy(0,50*8,240,8,1,50),
@@ -87,8 +132,10 @@ function init() {
 	getEnemy(0,50*16,240,8,1,50),
 	getEnemy(1,50*20,320,8,1,50),
 	getEnemy(0,50*24,240,8,1,50),
-  ];
-  levels[2] = [
+  ]);
+
+  // Level 7
+  levels.push([
 	getEnemy(0,50,160,8,1,50),
 	getEnemy(1,50*4,80,8,1,50),
 	getEnemy(0,50*8,160,8,1,50),
@@ -96,7 +143,7 @@ function init() {
 	getEnemy(0,50*16,160,8,1,50),
 	getEnemy(1,50*20,80,8,1,50),
 	getEnemy(0,50*24,160,8,1,50),
-	
+
 	getEnemy(0,50,240,8,1,50),
 	getEnemy(1,50*4,320,8,1,50),
 	getEnemy(0,50*8,240,8,1,50),
@@ -104,7 +151,7 @@ function init() {
 	getEnemy(0,50*16,240,8,1,50),
 	getEnemy(1,50*20,320,8,1,50),
 	getEnemy(0,50*24,240,8,1,50),
-	
+
 	getEnemy(0,50,400,10,1,50),
 	getEnemy(1,50*4,480,10,1,50),
 	getEnemy(0,50*8,400,10,1,50),
@@ -112,7 +159,56 @@ function init() {
 	getEnemy(0,50*16,400,10,1,50),
 	getEnemy(1,50*20,480,10,1,50),
 	getEnemy(0,50*24,400,10,1,50),
-  ];
+  ]);
+
+  // Level 8
+  levels.push([
+	  getEnemy(1,50,160,8,1,50),
+	  getEnemy(1,50*4,80,8,1,50),
+	  getEnemy(1,50*8,160,8,1,50),
+	  getEnemy(1,50*16,160,8,1,50),
+	  getEnemy(1,50*20,80,8,1,50),
+	  getEnemy(1,50*24,160,8,1,50),
+    ]);
+
+
+    // Level 9
+    levels.push([
+    getEnemy(1,50,160,8,1,50),
+    getEnemy(1,50*4,80,8,1,50),
+    getEnemy(1,50*8,160,8,1,50),
+    getEnemy(1,50*12,80,8,1,50),
+    getEnemy(1,50*16,160,8,1,50),
+    getEnemy(1,50*20,80,8,1,50),
+    getEnemy(1,50*24,160,8,1,50),
+
+    getEnemy(0,50,240,8,1,50),
+    getEnemy(1,50*4,320,8,1,50),
+    getEnemy(0,50*8,240,8,1,50),
+    getEnemy(1,50*12,320,8,1,50),
+    getEnemy(0,50*16,240,8,1,50),
+    getEnemy(1,50*20,320,8,1,50),
+    getEnemy(0,50*24,240,8,1,50),
+    ]);
+
+    // Level 10
+    levels.push([
+    getEnemy(1,50,160,8,1,50),
+    getEnemy(1,50*4,80,8,1,50),
+    getEnemy(1,50*8,160,8,1,50),
+    getEnemy(1,50*12,80,8,1,50),
+    getEnemy(1,50*16,160,8,1,50),
+    getEnemy(1,50*20,80,8,1,50),
+    getEnemy(1,50*24,160,8,1,50),
+
+    getEnemy(1,50,240,8,1,50),
+    getEnemy(1,50*4,320,8,1,50),
+    getEnemy(1,50*8,240,8,1,50),
+    getEnemy(1,50*12,320,8,1,50),
+    getEnemy(1,50*16,240,8,1,50),
+    getEnemy(1,50*20,320,8,1,50),
+    getEnemy(1,50*24,240,8,1,50),
+    ]);
   startLevel(levelNum++);
 }
 
@@ -149,51 +245,59 @@ function setLevel(levelNum) {
 	}
 }
 
+
+let alreadyLaunched = false;
+
 function move(e) {
+  console.log(e.which);
+
 	// Space bar
 	if (e.which == 32) {
-		boost = true;
+    if (!alreadyLaunched) {
+      launch(player1);
+    }
+    alreadyLaunched = true;
 	}
 	// w
-	if (e.which == 87) {
+	if (e.which == 87 || e.which == 38) {
 		player1.yDirection = -1;
 	}
 	// a
-	if (e.which == 65) {
+	if (e.which == 65 || e.which == 37) {
 		player1.xDirection = -1;
 	}
 	// s
-	if (e.which == 83) {
+	if (e.which == 83 || e.which == 40) {
 		player1.yDirection = 1;
 	}
 	// d
-	if (e.which == 68) {
+	if (e.which == 68 || e.which == 39) {
 		player1.xDirection = 1;
 	}
 }
 
-function stop(e) {	
+function stop(e) {
 	// Space bar
 	if (e.which == 32) {
-		boost = true;
+    alreadyLaunched = false;
 	}
 	// w
-	if (e.which == 87) {
+	if (e.which == 87 || e.which == 38) {
 		if (player1.yDirection < 0)
 			player1.yDirection = 0;
 	}
 	// a
-	if (e.which == 65) {
+	if (e.which == 65 || e.which == 37) {
 		if (player1.xDirection < 0)
 			player1.xDirection = 0;
 	}
 	// s
-	if (e.which == 83) {
+	if (e.which == 83 || e.which == 40) {
 		if (player1.yDirection > 0)
 			player1.yDirection = 0;
 	}
 	// d
-	if (e.which == 68) {
+	if (e.which == 68 || e.which == 39) {
 		if (player1.xDirection > 0)
 			player1.xDirection = 0;
 	}
@@ -237,8 +341,18 @@ function handleCanvasClick(event) {
   const x = event.offsetX;
   const y = event.offsetY;
 
-  // TODO make it so clicking the planet adds a shield instead of explodes
   launch(player1);
+}
+
+function handleTouchMove(event) {
+  // TODO find a better way to determine is mobile
+  isMobile = true;
+  var touchLocation = event.targetTouches[0];
+  event.preventDefault();
+
+  // assign player new position based on the touch
+  player1.x = touchLocation.pageX;
+  player1.y = touchLocation.pageY;
 }
 
 // TODO figure out if I can use touch events
@@ -247,6 +361,10 @@ function handleCanvasTouch(event) {
     let t = event.targetTouches[i];
     launch(player1);
   }
+}
+function handleMouseMove(event) {
+  mousex = event.offsetX;
+  mousey = event.offsetY;
 }
 
 function launch(object, direction, isEnemyFire, speed) {
@@ -311,7 +429,7 @@ function drawCanvas() {
 
   drawSprite(player1);
   drawText("Score: "+score,250,50,"#FA0");
-  
+
   remainingTime = Math.max(0,timer-Math.round((lastCalcTime-levelStartTime)/1000));
   drawText("Timer: "+remainingTime,50,50,timerTextColor);
   if (levelText != "") {
@@ -320,8 +438,8 @@ function drawCanvas() {
   if (timerBonusText != "") {
 	  drawTimerBonusText();
   }
-  
-  
+
+
   window.requestAnimationFrame(drawCanvas);
 }
 
@@ -374,22 +492,22 @@ function cleanData() {
 function checkDots(dots, enemies) {
 	let activeEnemyFire = 0;
 	let liveEnemies = 0;
-	
+
 	for (let j=0; j<enemies.length; j++) {
 		enemy = enemies[j];
 		if (!enemy) {
 			continue;
 		}
-		liveEnemies++;		
+		liveEnemies++;
 	}
-	
+
     for (let i=0; i<dots.length; i++) {
-		
+
         dot = dots[i];
 		if (dot == undefined) {
 			continue;
 		}
-		
+
 		if (dot && dot.y > height || dot.y < 0) {
 			dot.offscreen = true;
 		}
@@ -412,7 +530,7 @@ function checkDots(dots, enemies) {
 			activeEnemyFire++;
 		}
     }
-	
+
 	if(levelStarted && activeEnemyFire == 0 && liveEnemies == 0) {
 		levelStartTime = 0;
 		levelStarted = false;
@@ -436,7 +554,7 @@ function impact(enemy, dot) {
 	enemy.hit = true;
 	dot.impacted = true;
 	score+=1;
-	
+
 	if (enemy.parent) {
 		enemies.push(getEnemy(enemy.imageIndex, enemy.x, enemy.y, enemy.xv*1.25, 1, enemy.radius/2, false));
 		enemies.push(getEnemy(enemy.imageIndex, enemy.x, enemy.y, enemy.xv*1.25, -1, enemy.radius/2, false));
@@ -463,12 +581,28 @@ function recalculateData() {
       dot.x = dot.x + (dot.xv*elapsedTime);
     }
   }
-  
-  player1.x = player1.x + (player1.xDirection*player1.speed);
-  player1.y = player1.y + (player1.yDirection*player1.speed);
-  
+
+  // Mobile way may just be better in general
+  if(!isMobile){
+    newx = mousex;
+    newy = mousey;
+  }
+  else {
+    newx = player1.x + (player1.xDirection*player1.speed);
+    newy = player1.y + (player1.yDirection*player1.speed);
+  }
+  if (newx >= player1.radius && newx <= (width-player1.radius)) {
+    player1.x = newx;
+  }
+
+  // Keep player below half-way and above bottom
+  if (newy >= (height/2+player1.radius) && newy <= (height-player1.radius)) {
+    player1.y = newy;
+  }
+
+
   calculateEnemyPosition(enemies, lastCalcTime);
-  
+
   lastCalcTime = (new Date()).getTime();
 }
 
@@ -486,11 +620,11 @@ function calculateEnemyPosition(enemies, lastCalcTime) {
 		} else if (enemy.x > width-enemy.radius) {
 			enemy.direction = -1;
 		}
-		
+
 		let elapsedTime = ((new Date()).getTime() - lastCalcTime)*1.0/1000.0;
-		
+
 		enemy.x = enemy.x + (enemy.direction*enemy.xv*elapsedTime/speedFactor);
-		
+
 		if (Math.random()>.995) {
 			launch(enemy, -1, true, .5);
 		}
@@ -521,10 +655,10 @@ let enemyImageList = [
 
 function getEnemy(imageIndex, x, y, xv, direction, radius, parent) {
 	imageIndex = (imageIndex == undefined) ? Math.floor(Math.random()*2) : imageIndex;
-	
+
 	isParent = (parent == undefined) ? true : false;
 	isParent = (imageIndex == 0) ? false : isParent;
-	
+
 	return {
 		x: x || Math.random()*width,
 		y: y || height/15+(Math.random()*height/3),

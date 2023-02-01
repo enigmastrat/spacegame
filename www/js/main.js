@@ -8,6 +8,7 @@ var canvas;
 var ctx;
 
 var dots = [];
+var warnings = [];
 var width;
 var height;
 var colorPicker;
@@ -240,6 +241,8 @@ function setLevel(levelNum) {
 		levelText = "";
 		timerBonusText = "";
 		levelStarted = true;
+    // Reset the warnings array to avoid any potential memory leaks
+    warnings = [];
 		enemies = levels[levelNum];
 	    levelStartTime = (new Date()).getTime();
 	}
@@ -352,7 +355,11 @@ function handleTouchMove(event) {
 
   // assign player new position based on the touch
   player1.x = touchLocation.pageX;
-  player1.y = touchLocation.pageY;
+
+  // Don't let the player move above the half-way point
+  y = touchLocation.pageY-100;
+  y = (y<height/2) ? height/2 : y;
+  player1.y = y;
 }
 
 // TODO figure out if I can use touch events
@@ -439,8 +446,25 @@ function drawCanvas() {
 	  drawTimerBonusText();
   }
 
+  drawWarnings();
+
 
   window.requestAnimationFrame(drawCanvas);
+}
+
+function drawWarnings() {
+  for (i in warnings) {
+    warning = warnings[i];
+
+    ctx.font = "62px Arial";
+    ctx.fillStyle = "rgba(255, 100, 0, " + warning.opacity + ")";
+    ctx.fillText(warning.string, warning.x, warning.y);
+
+    warning.opacity -= .05;
+    if (warning.opacity <= 0) {
+      delete warnings[i];
+    }
+  }
 }
 
 function drawText(score, x, y, color) {
@@ -544,10 +568,24 @@ function checkDots(dots, enemies) {
 	}
 }
 
+function createWarning(string, x, y) {
+  warning = {
+    string: string,
+    x: x,
+    y: y,
+    opacity: 1
+  };
+
+  warnings.push(warning);
+}
+
 function death(player, dot) {
+  scoreChange = -5;
 	dot.impacted = true;
-	score -= 5;
+	score += scoreChange;
 	score = (score < 0) ? 0 : score;
+
+  createWarning(scoreChange, player.x, player.y-100);
 }
 
 function impact(enemy, dot) {
